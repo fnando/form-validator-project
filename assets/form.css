@@ -1,0 +1,83 @@
+*,
+*:after,
+*:before {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 50px;
+  font-family: sans-serif;
+}
+
+form {
+  width: 400px;
+  margin: 0 auto;
+}
+
+label {
+  display: block;
+  padding: 5px;
+}
+
+input[type=checkbox] + label {
+  display: inline-block;
+}
+
+input[type=text],
+input[type=password] {
+  font-size: 16px;
+  padding: 5px 10px;
+  width: 350px;
+}
+
+input[type=submit] {
+  background: #a0d232;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+input[type=submit]:hover {
+  background: #92c02c;
+}
+
+.hint {
+  display: block;
+  color: #888;
+  padding: 5px;
+}
+
+.error {
+  display: block;
+  color: #bf4e3f;
+  padding: 5px;
+}
+
+.error:before {
+  content: "\26A0";
+  font-size: 20px;
+  position: relative;
+  top: 2px;
+}
+
+
+form p {
+  margin: 20px 0 0 0;
+}
+
+.error-messages p {
+  font-weight: bold;
+  font-size: 20px;
+  color: #bf4e3f;
+  margin: 0;
+}
+
+.with-error input {
+  background: #fcc;
+}
