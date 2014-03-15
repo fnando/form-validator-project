@@ -4,7 +4,7 @@ describe("Validator.ConfirmationValidator", function(){
   beforeEach(function(){
     record = {};
     options = {attribute: "password"};
-    validator = new Validator.ConfirmationValidator(record, options);
+    validator = new Validator.ConfirmationValidator(record, "password", options);
   });
 
   it("returns the default error message", function(){

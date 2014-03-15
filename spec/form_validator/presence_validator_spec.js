@@ -4,7 +4,7 @@ describe("Validator.PresenceValidator", function(){
   beforeEach(function(){
     record = {};
     options = {attribute: "name"};
-    validator = new Validator.PresenceValidator(record, options);
+    validator = new Validator.PresenceValidator(record, "name", options);
   });
 
   it("returns the default error message", function(){

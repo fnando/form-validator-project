@@ -18,7 +18,6 @@ describe("Validator.Errors", function(){
     errors.add("email", "is invalid");
     errors.add("email", "is already taken");
 
-    expect(errors.all().length).toEqual(2);
     expect(errors.all()["name"]).toEqual(["is required"]);
     expect(errors.all()["email"]).toEqual(["is invalid", "is already taken"]);
   });
@@ -29,7 +28,6 @@ describe("Validator.Errors", function(){
 
     expect(errors.isEmpty()).toBeTruthy();
     expect(errors.length).toEqual(0);
-    expect(errors.all().length).toEqual(0);
   });
 
   it("returns errors for an attribute", function(){

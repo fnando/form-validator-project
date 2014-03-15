@@ -5,7 +5,7 @@ describe("Validator", function(){
     beforeEach(function(){
       record = {name: "John Doe"};
       validator = new Validator();
-      validator.validate("presence", "name", "Name is required");
+      validator.validate("presence", "name", {message: "Name is required"});
     });
 
     it("returns true", function(){
@@ -19,8 +19,8 @@ describe("Validator", function(){
     beforeEach(function(){
       record = {name: "John Doe", email: null};
       validator = new Validator();
-      validator.validate("presence", "name", "Name is required");
-      validator.validate("presence", "email", "E-mail is required");
+      validator.validate("presence", "name", {message: "Name is required"});
+      validator.validate("presence", "email", {message: "E-mail is required"});
     });
 
     it("returns false", function(){

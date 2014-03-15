@@ -4,7 +4,7 @@ describe("Validator.FormatValidator", function(){
   beforeEach(function(){
     record = {};
     options = {attribute: "username", format: /^[a-z0-9_-]+$/i};
-    validator = new Validator.FormatValidator(record, options);
+    validator = new Validator.FormatValidator(record, "username", options);
   });
 
   it("returns the default error message", function(){

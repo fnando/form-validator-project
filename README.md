@@ -22,7 +22,7 @@ Os requisitos são:
 A regras de validação são as seguintes:
 
 * O campo `Your name` não pode ficar em branco.
-* O campo `Your e-mail` deve ser validado com a seguinte expressão regular: `/^[a-z0-9]+([._][a-z0-9]+)*(+[a-z0-9_-]+)@[a-z0-9]+([.-][a-z0-9]+)*\.[a-z]{2,4}?$/i`.
+* O campo `Your e-mail` deve ser validado com a seguinte expressão regular: `/^[a-z0-9]+([._][a-z0-9]+)*(\+[a-z0-9_-]+)@[a-z0-9]+([.-][a-z0-9]+)*\.[a-z]{2,4}?$/i`.
 * O campo `Your password` deve ter conter pelo menos 8 caracteres.
 * O campo `Confirm your password` deve ser igual ao campo `Your password`.
 
