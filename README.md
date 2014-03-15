@@ -26,7 +26,7 @@ A regras de validação são as seguintes:
 * O campo `Your password` deve ter conter pelo menos 8 caracteres.
 * O campo `Confirm your password` deve ser igual ao campo `Your password`.
 
-Para ver o formulário em ação, visite a URL <http://example.org>
+Para ver o formulário em ação, visite a URL <http://codepen.io/fnando/full/Khget>.
 
 **Lembre-se!** Não modifique o HTML, nem o CSS. Apenas faça com que a validação funcione, adicionando os elementos necessários para que as mensagens de erro sejam exibidas.
 
