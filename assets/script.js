@@ -5,7 +5,8 @@ var form = document.getElementsByTagName('form')[0];
 var validations = {
 	rules: {
 		'name': {
-			'required': true
+			'greather': true
+			//'required': true
 		},
 		'email': {
 			'email': true
@@ -38,6 +39,13 @@ window.onload = function(){
 
 	//Instantiate form
 	var validateForm = new FormValidator(form, validations);
+
+	// validateForm.addValidateMethod("greather", function(value, arg){
+
+	// 	return value.length > 8;
+
+	// }, "Greather than 8.");
+
 	//console.log(validateForm);
 	
 	//Validation and ajax action

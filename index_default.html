@@ -7,7 +7,7 @@
 </head>
 <body>
   <form action="#">
-    <!--<div class="error-messages">
+    <div class="error-messages">
       <p>
         Please double check your data before continuing:
       </p>
@@ -17,13 +17,16 @@
           The name is required.
         </li>
       </ul>
-    </div>-->
+    </div>
 
-    <p>
+    <p class="with-error">
       <label for="name">Your name</label>
       <input type="text" name="name" id="name">
       <span class="hint">
         This is how your colleagues will see your name.
+      </span>
+      <span class="error">
+        The name is required.
       </span>
     </p>
 
