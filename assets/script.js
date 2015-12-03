@@ -5,8 +5,8 @@ var form = document.getElementsByTagName('form')[0];
 var validations = {
 	rules: {
 		'name': {
-			'greather': true
-			//'required': true
+			//'greather': true
+			'required': true
 		},
 		'email': {
 			'email': true

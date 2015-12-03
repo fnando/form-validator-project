@@ -3,16 +3,32 @@
  * 2015-11-30
  */
 
- var FormValidator = (function(formObject, validations) {
+function extendOptions(def, config) {
+
+	var options = {};
+
+	for(var item in def) {
+		//options[p] = config[p] == null ? def[p] : config[p];
+	}
+
+	return options;
+};
+
+ var FormValidator = (function(form, validations) {
 
  	var defaultMessages = {
  		required: 'This field is required',
  		email: 'Fill this field with the format "user@server.com"',
  		min: 'Fill this field with minimun of {0} characters.',
  		max: 'Fill this field with maximun of {0} characters.',
- 		equalTo: 'This field is not equal to {0}'
+ 		equalTo: 'This field is wrong.'
  	};
 
+	//console.log("Validations -> ", validations.messages);
+ 	
+ 	//Extend the messages
+ 	// var messages = validations.messages ? 
+ 	// 	extendOptions(defaultMessages, validations.messages) : defaultMessages;
  	var messages = defaultMessages;
 
  	var validator = {
@@ -31,39 +47,63 @@
  				return reg.test(value);
  			},
 	 		min: function(value, minValue) {
- 				return value.length < minValue;
+ 				return value.length >= minValue;
  			},
 	 		max: function(value, maxValue) {
- 				return value.length > maxValue;
+ 				return value.length <= maxValue;
  			},
 	 		equalTo: function(value, elementEqual) {
 	 			var elEqual = document.querySelector(elementEqual);
- 				return value === elEqual.value;
+	 			
+ 				return value === elEqual.value && value.length > 0;
  			}
  		},
+ 		/**
+ 		 * [getFormFields description]
+ 		 * 
+ 		 * @return {[type]} [description]
+ 		 */
  		getFormFields: function() {
  			var fields = [];
- 			fields = formObject.querySelectorAll("input");
+ 			fields = form.querySelectorAll("input, textarea, select");
  			
  			validator._fields = fields;
 
  			return validator._fields;
  		},
+ 		/**
+ 		 * [addContainerFieldErrorClass description]
+ 		 * 
+ 		 * @param {[type]} field [description]
+ 		 */
  		addContainerFieldErrorClass: function(field) {
  			
  			field.parentElement.className = validator._containerFieldErrorClass;
 
- 			//console.log("Parent -> ", field.parentElement);
- 			//console.log("Container class -> ", validator._containerFieldErrorClass);
  		},
+ 		/**
+ 		 * [removeContainerFieldErrorClass description]
+ 		 * 
+ 		 * @param  {[type]} field [description]
+ 		 * @return {[type]}       [description]
+ 		 */
  		removeContainerFieldErrorClass: function(field) {
  			
  			field.parentElement.className = '';
 
  		},
- 		addFieldErrorMessage: function(field, message) {
+ 		/**
+ 		 * [addFieldErrorMessage description]
+ 		 * 
+ 		 * @param {[type]} field   [description]
+ 		 * @param {[type]} message [description]
+ 		 * @param {[type]} args    [description]
+ 		 */
+ 		addFieldErrorMessage: function(field, message, args) {
  			
  			var component = field.parentElement.querySelector('.error');
+
+ 			var message = validator.replaceMessageArguments(message, args);
 
  			if(!component) {
  			
@@ -75,6 +115,12 @@
  			}
 
  		},
+ 		/**
+ 		 * Remove a field error message
+ 		 * 
+ 		 * @param  object field
+ 		 * @return 
+ 		 */
  		removeFieldErrorMessage: function(field) {
  			
  			var component = field.parentElement.querySelector('.error');
@@ -84,6 +130,19 @@
  				component.remove();
  			}
 
+ 		},
+ 		/**
+ 		 * Replace arguments in a message
+ 		 * 
+ 		 * @param  string message
+ 		 * @param  string|array args
+ 		 * @return string
+ 		 */
+ 		replaceMessageArguments: function(message, args) {
+
+ 			var args = args instanceof Array ? args.join("") : args;
+
+ 			return message.replace("{0}", args);
  		},
  		/**
  		 * Add a custom validate method
@@ -98,11 +157,15 @@
  			messages[name] = !message ? "Please fix this field." : message;
 
  		},
- 		//Validate and set the valid var 
+ 		/**
+ 		 * Validate and set the valid var 
+ 		 * 
+ 		 * @return boolean validator._valid
+ 		 */
  		validate: function() {
- 			var valid = false;
-
- 			var fields = validator.getFormFields();
+ 			
+ 			var valid = true,
+ 				fields = validator.getFormFields();
 
  			for(var i = 0; i < fields.length; i++){
 
@@ -118,8 +181,8 @@
  						//console.log("Rule -> ", rule, "\n");
  						//console.log("Value -> ", rules[rule], "\n");
  						
- 						var method = rule;
- 						var args = rules[rule];
+ 						var method = rule,
+ 							args = rules[rule];
 
  						if(validator._validations[method]) {
  							//console.log(validator._validations[method], " -> ", validator._validations[method](field, args));
@@ -130,13 +193,17 @@
  								validator.addContainerFieldErrorClass(field);
 
  								//Add message
- 								validator.addFieldErrorMessage(field, messages[method]);
+ 								validator.addFieldErrorMessage(field, messages[method], args);
+
+ 								//The validations fail
+ 								valid = false;
  							}
  							else {
 
+ 								//Remove container field error class
  								validator.removeContainerFieldErrorClass(field);
 
- 								//Add message
+ 								//Remove field error message
  								validator.removeFieldErrorMessage(field);
  							}
  						}
@@ -146,22 +213,68 @@
  			};
 
  			validator._valid = valid;
+
+ 			validator.handleRemoveErrorOnBlur();
  		},
- 		onSubmit: function(e) {
+ 		/**
+ 		 * [handleRemoveErrorOnBlur description]
+ 		 * 
+ 		 * @return
+ 		 */
+ 		handleRemoveErrorOnBlur: function() {
+ 			
+		 	var elements = form.querySelectorAll('.' + validator._containerFieldErrorClass),
+		 	element,
+		 	field;
+
+		 	for(var i = 0; i < elements.length; i++) {
+
+		 		element = elements[i];
+
+		 		field = element.querySelector("input, textarea, select");
+
+		 		if(field) {
+
+			 		field.onblur = (function() {
+
+			 				//console.log("Onblur of element -> ", this.name);
+			 				
+			 				//Remove the errors messages and classes
+			 				validator.removeContainerFieldErrorClass(this);
+			 				
+			 				validator.removeFieldErrorMessage(this);
+
+			 		}.bind(field));
+
+		 		}
+
+		 	};
+
+ 		},
+ 		/**
+ 		 * onSubmit event controled by the validator
+ 		 * 
+ 		 * @param  object e (event)
+ 		 * @return
+ 		 */
+ 		handleOnSubmit: function(e) {
 
 			e.preventDefault();
 
+			//Validate the form
 			validator.validate();
-						
+
+			//Verify if form is valid
 			if(validator._valid) {
-				formObject.submit();
+				form.submit();
 			}
 		}
  	};
 
  	//Brake the submit
- 	formObject.onsubmit = validator.onSubmit;
- 	
+ 	form.onsubmit = validator.handleOnSubmit;
+
+ 	//API
  	return {
  		//Return if form is valid
  		valid: validator.validate,
