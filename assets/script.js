@@ -5,13 +5,15 @@ var form = document.getElementsByTagName('form')[0];
 var validations = {
 	rules: {
 		'name': {
-			//'greather': true
-			'required': true
+			'required': true,
+			'greather': true
 		},
 		'email': {
+			'required': true,
 			'email': true
 		},
 		'password': {
+			//'required': false,
 			'min': 8
 		},
 		'password_confirmation': {
@@ -23,6 +25,7 @@ var validations = {
 			'required': 'Este campo não pode ficar em branco.'
 		},
 		'email': {
+			'required': 'Este campo não pode ficar em branco.',
 			'email': 'Informe um e-mail válido'
 		},
 		'password': {
@@ -39,12 +42,13 @@ window.onload = function(){
 
 	//Instantiate form
 	var validateForm = new FormValidator(form, validations);
+	//var validateForm = new FormValidator('body > form', validations);
 
-	// validateForm.addValidateMethod("greather", function(value, arg){
+	validateForm.addMethod("greather", function(value, element, param){
 
-	// 	return value.length > 8;
+		return value.length > 8;
 
-	// }, "Greather than 8.");
+	}, "Greather than 8.");
 
 	//console.log(validateForm);
 	
