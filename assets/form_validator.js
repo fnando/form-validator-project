@@ -36,7 +36,7 @@
  	var validateForm = new FormValidator(form, validations);
  
  */
- var FormValidator = (function(form, validations) {
+ var FormValidator = (function(form, validations, options) {
 
  	var validator = {
  		_valid: false,
@@ -54,22 +54,34 @@
 	 		equalTo: 'This field is wrong.'
 	 	},
  		_validations: {
+ 			//Return if element attemp the requisitions
  			required: function(value, element, param) {
 
- 				switch(typeof param) {
+ 				//Fallback to select element
+ 				if( element.nodeName.toLowerCase() === 'select' ) {
+ 					return element.value.length > 0;
+ 				}
+ 				//Fallback to radio and checkbox
+ 				else if( (/radio|checkbox/).test(element.type) ) {
+ 					return element.length > 0;
+ 				}
+ 				else {
 
- 					case 'string':
+	 				switch(typeof param) {
 
- 					break;
- 					case 'boolean':
- 						return value.length > 0;
- 					break;
- 					case 'function':
+	 					case 'string':
+	 						var newElement = document.querySelector(param);
+	 						return validator.call(this, newElement);
+	 					break;
+	 					case 'boolean':
+	 						return value.length > 0;
+	 					break;
+	 					case 'function':
+	 						return param.call(this, element, value);
+	 					break;
 
- 						return param.call(this, element, value);
-
- 					break;
-
+	 				}
+ 					
  				}
  			},
  			//Checks if the value is a valid e-mail
@@ -95,6 +107,7 @@
  				return validator.optional(elEqual) || (value === elEqual.value && value.length > 0);
  			}
  		},
+
  		/**
  		 * Return if this field its defined with optional
  		 * 
@@ -110,12 +123,13 @@
  			return true;
 
  		},
+
  		/**
- 		 * [getFormFields description]
+ 		 * Return the fields
  		 * 
- 		 * @return {[type]} [description]
+ 		 * @return object _fields
  		 */
- 		getFormFields: function() {
+ 		getFields: function() {
 
  			if(validator._fields.length === 0) {
 
@@ -128,6 +142,7 @@
 
  			return validator._fields;
  		},
+
  		/**
  		 * Exchange messages
  		 * 
@@ -139,7 +154,7 @@
 
  			var	messages = {},
  				customMessages = customMessages || {},
- 				fields = validator.getFormFields(),
+ 				fields = validator.getFields(),
  				fieldName;
 
  			//Each field
@@ -152,53 +167,59 @@
  				messages[fieldName] = {};
 
  				//Fill rules with your default messages
- 				for(var rule in validations.rules[fieldName])
+ 				for( var rule in validations.rules[fieldName] )
 
- 					if(validations.rules[fieldName][rule])
-
+ 					if( validations.rules[fieldName][rule] ) {
 						messages[fieldName][rule] = defaultMessages[rule] ? defaultMessages[rule] : validator._defaultErrorMessage;
 
+						//Replace param rules
+						messages[fieldName][rule] = validator.replaceMessageParams(messages[fieldName][rule], validations.rules[fieldName][rule]);
+					}
+
  				//If exists custom messages
- 				if(customMessages[fieldName])
+ 				if( customMessages[fieldName] )
 
- 					if(Object.keys(customMessages[fieldName]).length > 0)
+ 					if( Object.keys(customMessages[fieldName]).length > 0 )
 
-	 					for(var rule in customMessages[fieldName])
+	 					for( var rule in customMessages[fieldName] )
 
 	 						//Set custom message, if its exists
-	 						if(customMessages[fieldName][rule])
-	 							messages[fieldName][rule] = customMessages[fieldName][rule];
+	 						if( customMessages[fieldName][rule] )
+	 							messages[fieldName][rule] = validator.replaceMessageParams(customMessages[fieldName][rule], validations.rules[fieldName][rule]);
  				
  			}
 
  			return messages;
  		},
+
  		/**
  		 * Add class from field's container
  		 * 
  		 * @param object field
  		 */
- 		addContainerErrorClass: function(field) {
+ 		addContainerErrorClass: function( field ) {
  			
  			field.parentElement.className = validator._containerFieldErrorClass;
 
  		},
+
  		/**
  		 * Remove class from field's container
  		 * 
  		 * @param  object field
  		 */
- 		removeContainerErrorClass: function(field) {
+ 		removeContainerErrorClass: function( field ) {
  			
  			field.parentElement.className = '';
 
  		},
+
  		/**
  		 * Add field error message to a field
  		 * 
  		 * @param object field
  		 * @param string message
- 		 * @param {[type]} args    [description]
+ 		 * @param string param
  		 */
  		addFieldErrorMessage: function(field, message, param) {
  			
@@ -216,6 +237,7 @@
  			}
 
  		},
+
  		/**
  		 * Remove a field error message
  		 * 
@@ -231,11 +253,12 @@
  				component.remove();
 
  		},
+
  		/**
  		 * Replace params in a message
  		 * 
  		 * @param  string message
- 		 * @param  string|array args
+ 		 * @param  string|array params
  		 * @return string
  		 */
  		replaceMessageParams: function(message, params) {
@@ -244,6 +267,7 @@
 
  			return message.replace("{0}", params);
  		},
+
  		/**
  		 * Add a custom validate method
  		 * 
@@ -265,6 +289,7 @@
  			//Refresh changes
  			validator._messages = validator.exchangeMessages(validator._defaultMessages, validations.messages);
  		},
+
  		/**
  		 * Remove anomalies from rules
  		 * 
@@ -285,39 +310,77 @@
 
  			return normalizedRules;
  		},
- 		getErrorsMessages: function(fieldName) {
 
- 			return fieldName ? validator._errors[fieldName] : validator._errors;
+ 		/**
+ 		 * [errorsMessages description]
+ 		 * @param  {[type]} fieldName [description]
+ 		 * @return {[type]}           [description]
+ 		 */
+ 		errorsMessages: function( fieldName ) {
+
+ 			if(fieldName) {
+ 				
+ 				return validator._errors[fieldName];
+
+ 			}
+ 			else {
+
+ 				var messages = [],
+ 					avoid = {},
+ 					currentField,
+ 					lastMessage;
+
+ 				for( var field in validator._errors ) {
+
+ 					if( !avoid[field] ) {
+ 						
+		 				currentField = validator._errors[field];
+
+		 				lastMessage = validator._errors[field][currentField.length - 1];
+
+		 				messages.push(lastMessage);
+
+		 				avoid[field] = true;
+ 					}
+
+	 			}
+
+	 			return messages;
+
+ 			}
  		},
- 		check: function(field) {
+
+ 		/**
+ 		 * [check description]
+ 		 * @param  {[type]} field [description]
+ 		 * @return {[type]}       [description]
+ 		 */
+ 		check: function( field ) {
 
  			var validField = true,
  				errors = 0,
  				fieldName = field.name;
+ 				validator._errors[fieldName] = [];
 
- 			if(fieldName in validations.rules) {
- 					
+ 			if ( fieldName in validations.rules ) {	
+
 				var rules = validator.normalizeRules(validations.rules[field.name]);
 
-				for(var rule in rules) {
+				for( var rule in rules ) {
 
 					var method = rule,
 						param = rules[rule],
 						message;
 
-					if(validator._validations[method]) {
+					if( validator._validations[method] ) {
 						
-						if(!validator._validations[method].call(this, field.value, field, param)) {
+						if( !validator._validations[method].call(this, field.value, field, param) ) {
 
 							message = validator._messages[fieldName][method];
 
 							//Add message
 							validator.addFieldErrorMessage(field, message, param);
-
 							
-							if(!validator._errors[fieldName]) 
-								validator._errors[fieldName] = [];
-
 							validator._errors[fieldName].push(message);
 
 							errors++;
@@ -341,11 +404,15 @@
 
 				//Remove field error message
 				validator.removeFieldErrorMessage(field);
+
+				//No errors found, remove array
+				delete validator._errors[fieldName];
 			}
 
 			return validField;
 
  		},
+
  		/**
  		 * Validate and set the valid var 
  		 * 
@@ -355,7 +422,7 @@
  			
  			var validForm = true,
  				validField = true,
- 				fields = validator.getFormFields(),
+ 				fields = validator.getFields(),
  				field;
 
  			for(var i = 0; i < fields.length; i++){
@@ -373,8 +440,9 @@
 
  			validator.handleRemoveErrorOnBlur();
  		},
+
  		/**
- 		 * [handleRemoveErrorOnBlur description]
+ 		 * Handle the onBlur field event
  		 * 
  		 * @return
  		 */
@@ -393,10 +461,7 @@
 		 		if(field) {
 
 			 		field.onblur = (function() {
-
-			 			//console.log("Onblur of element -> ", this.name);
-			 				
-			 			//Remove the errors messages and classes
+	
 		 				validator.removeContainerErrorClass(this);
 		 				
 		 				validator.removeFieldErrorMessage(this);
@@ -408,8 +473,9 @@
 		 	};
 
  		},
+
  		/**
- 		 * onSubmit event controled by the validator
+ 		 * Handle onSubmit event controled by the validator
  		 * 
  		 * @param  object e (event)
  		 * @return
@@ -422,13 +488,47 @@
 			//Validate the form
 			validator.validate();
 
-			//console.log("List of errors: ", validator.getErrorsMessages());
-
 			//Verify if form is valid
-			if(validator._valid) {
+			if( validator._valid ) {
 				form.submit();
 			}
+			else {
+
+				if( options.containerErrorsList ) {
+
+			 		validator.handleErrorsList( options.containerErrorsList );
+			 	}
+
+			}
 		},
+
+		/**
+		 * [handleErrorsList description]
+		 * @param  {[type]} containerErrorsList [description]
+		 * @return {[type]}                     [description]
+		 */
+		handleErrorsList: function( containerErrorsList ) {
+
+			var containerErrorsList = document.querySelector( containerErrorsList ),
+				list = document.createDocumentFragment(),
+				ul = document.createElement('ul'),
+				li;
+
+			validator.errorsMessages().forEach(function(element, index) {
+
+				li = document.createElement('li');
+				li.textContent = element;
+				ul.appendChild(li);
+
+			});
+
+			list = list.appendChild(ul);
+
+			containerErrorsList.innerHTML = '';
+			containerErrorsList.appendChild(list);
+
+		},
+
 		/**
 		 * Initialize configurations
 		 * 
@@ -453,6 +553,7 @@
 
  	//API
  	return {
+
  		//Return if form is valid
  		valid: validator.validate,
 
@@ -460,7 +561,8 @@
  		addMethod: validator.addMethod,
 
  		//Return errors messages object
- 		getErrorsMessages: validator.getErrorsMessages
+ 		errorsMessages: validator.errorsMessages
+ 		
  	};
 
  });

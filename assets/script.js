@@ -40,8 +40,12 @@ var validations = {
 
 window.onload = function(){
 
+	var optionsValidate = {
+		containerErrorsList: '.error-messages'
+	};
+
 	//Instantiate form
-	var validateForm = new FormValidator(form, validations);
+	var validateForm = new FormValidator(form, validations, optionsValidate);
 	//var validateForm = new FormValidator('body > form', validations);
 
 	validateForm.addMethod("greather", function(value, element, param){
@@ -53,13 +57,17 @@ window.onload = function(){
 	//console.log(validateForm);
 	
 	//Validation and ajax action
-	/*form.onsubmit = function(e){
+	// form.onsubmit = function(e){
 		
-		e.preventDefault();
+	// 	e.preventDefault();
 
-		if(validateForm.valid())
-		{
-			alert("Enviando dados via ajax...");
-		}
-	};*/
+	// 	validateForm.valid();
+
+	// 	//console.log("List of errors -> ", validateForm.errorsMessages());
+
+	// 	if(validateForm.valid())
+	// 	{
+	// 		alert("Enviando dados via ajax...");
+	// 	}
+	// };
 };
