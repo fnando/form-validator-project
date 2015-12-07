@@ -1,5 +1,5 @@
 //Get the form to validate
-var form = document.getElementsByTagName('form')[0];
+var form = document.getElementsByTagName( 'form' )[ 0 ];
 
 //Validations to be executed
 var validations = {
@@ -13,14 +13,16 @@ var validations = {
 			'email': true
 		},
 		'password': {
-			//'required': false,
+			'required': false,
 			'min': 8
 		},
 		'password_confirmation': {
+			'required': false,
 			'equalTo': "input[name='password']"
 		}
-	},
-	messages: {
+	}/* 
+	//Custom fields messages
+	,messages: {
 		'name': {
 			'required': 'Este campo não pode ficar em branco.'
 		},
@@ -34,44 +36,58 @@ var validations = {
 		'password_confirmation': {
 			'equalTo': "A confirmação de senha não confere."
 		}
-	}
+	}*/
 };
 
+//Custom options to FormValidator
+var validateOptions = {
 
-window.onload = function(){
+	//Container errors list
+	_containerErrorsList: '#error-messages-content',
 
-	var optionsValidate = {
-		containerErrorsList: '#error-messages-content'
-	};
+	//Default title before container errors list
+	_defaultErrorListMessage: 'Por favor, verifique os erros.',
+
+	//Exchange default messages
+	_defaultMessages: {
+ 		required: 'Este campo é requerido.',
+ 		email: 'Preencha este campo no formato "usuario@servidor.com"',
+ 		min: 'Preencha este campo com no mínimo de {0} caracteres.',
+ 		max: 'Preencha este campo com no máximo of {0} caracteres.',
+ 		equalTo: 'Este campo não é igual ao anterior'
+ 	}
+
+};
+
+window.onload = function() {
 
 	//Instantiate form
-	var validateForm = new FormValidator(form, validations, optionsValidate);
-	//var validateForm = new FormValidator(form);
-	//console.dir(validateForm);
-	//console.log("typeof -> ", typeof validateForm);
-	console.log("instanceof -> ", validateForm instanceof FormValidator);
+	var validateForm = new FormValidator( form, validations, validateOptions );
+
+	//Get form by selector
 	//var validateForm = new FormValidator('body > form', validations);
 
-	// validateForm.addMethod("greather", function(value, element, param){
+	//Custom method
+	// validateForm.addMethod("myCustomMethod", function( value, element, param ){
 
 	// 	return value.length > 8;
 
-	// }, "Greather than 8.");
-
-	//console.log(validateForm);
+	// }, "Message from my custom method.");
 	
-	//Validation and ajax action
+	//Validation with ajax action
 	// form.onsubmit = function(e){
 		
 	// 	e.preventDefault();
 
+	//Handle the validate 
 	// 	validateForm.valid();
 
-	// 	//console.log("List of errors -> ", validateForm.errorsMessages());
+	//Show message errors
+	// 	console.log("List of errors -> ", validateForm.errorsMessages());
 
-	// 	if(validateForm.valid())
+	// 	if( validateForm.valid() )
 	// 	{
-	// 		alert("Enviando dados via ajax...");
+	// 		alert("Sending the data...");
 	// 	}
 	// };
 };

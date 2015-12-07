@@ -1,28 +1,11 @@
-/*var customMatchers = {
-
-	toBeInstanceOf : function( actual, expected ) {
-		console.log(actual);
-		console.log(expected);
-		return this.actual instanceof expected && this.actual.length > 0;
-    
-	}
-
-};*/
-
-//jasmine.addMatchers(customMatchers);
-
-	//https://gist.github.com/m4nuC/4052863
-	// this.addMatchers({
-	// 	toBeInstanceOf : function( expected ) {
-	// 		return this.actual instanceof expected && this.actual.length > 0;
-	// 	},
-
-	// 	toBeA: function( expected ) {
-	// 		return typeof this.actual === expected;
-	// 	}
-	
-// });
-
+/**
+ * FormValidator Spec
+ *
+ * @author Carlos Henrique Carvalho de Santana <carlohcs@gmail.com>
+ *
+ * @date 2015-12-07 
+ * 
+ **/
 describe("FormValidator Suite Test", function() {
 
 	var	formObject,
@@ -36,13 +19,12 @@ describe("FormValidator Suite Test", function() {
 	});
 
 	it("should be a object", function() {
-
-		// and FormValidator instance
-		
+	
 		var formValidate = new FormValidator( formObject );
 		
 		expect( formObject ).toEqual( jasmine.any( Object ) );
 		
+		//This doesn't work
 		//expect( formValidate ).toBe( FormValidator );
 		//expect( formValidate ).toEqual( jasmine.any( FormValidator ) );
 
@@ -90,7 +72,7 @@ describe("FormValidator Suite Test", function() {
 	});
 	
 	//Fail validation
-	it("demonstrate a fail validation", function() { 
+	it("a fail validation", function() { 
 
 		var fields = {
 			'name': {
@@ -110,7 +92,6 @@ describe("FormValidator Suite Test", function() {
 				'value': ''
 			}
 		};
-
 
 		var currentField,
 			element;
@@ -154,7 +135,7 @@ describe("FormValidator Suite Test", function() {
 	});
 
 	//Fail validation and errors messages
-	it("demonstrate a fail validation and get errors messages", function() { 
+	it("a fail validation and get errors messages", function() { 
 
 		var fields = {
 			'name': {
@@ -174,7 +155,6 @@ describe("FormValidator Suite Test", function() {
 				'value': ''
 			}
 		};
-
 
 		var currentField,
 			element;
@@ -233,7 +213,7 @@ describe("FormValidator Suite Test", function() {
 	});
 
 	//Success validation
-	it("demonstrate a success validation", function() { 
+	it("a success validation", function() { 
 
 		var fields = {
 			'name': {
@@ -253,7 +233,6 @@ describe("FormValidator Suite Test", function() {
 				'value': '12345678'
 			}
 		};
-
 
 		var currentField,
 			element;
@@ -296,5 +275,51 @@ describe("FormValidator Suite Test", function() {
 
 	});
 
+	//Success validation with custom method
+	it("a success validation with a custom method", function() { 
+
+		var fields = {
+			'name': {
+				'type': 'text',
+				'value': 'Carlos Henrique Carvalho de Santana'
+			}
+		};
+
+		var currentField,
+			element;
+
+		for(var fieldName in fields) {
+
+			currentField = fields[fieldName];
+
+			p = document.createElement( 'p' );
+			element = document.createElement( 'input' );
+			element.name = fieldName;
+			element.type = currentField.type;
+			element.value = currentField.value;
+			
+			formObject.appendChild( element );
+
+		}
+
+		var validations = {
+			rules: {
+				'name': {
+					'myCustomMethod': true
+				}
+			}
+		};
+
+		var validateForm = new FormValidator( formObject, validations );
+
+		validateForm.addMethod("myCustomMethod", function(value, element, param){
+
+			return value.length > 8;
+
+		}, "Message from a custom method.");
+
+		expect( validateForm.valid() ).toBeTruthy();
+
+	});
 
 });
