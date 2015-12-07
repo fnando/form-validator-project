@@ -41,18 +41,22 @@ var validations = {
 window.onload = function(){
 
 	var optionsValidate = {
-		containerErrorsList: '.error-messages'
+		containerErrorsList: '#error-messages-content'
 	};
 
 	//Instantiate form
 	var validateForm = new FormValidator(form, validations, optionsValidate);
+	//var validateForm = new FormValidator(form);
+	//console.dir(validateForm);
+	//console.log("typeof -> ", typeof validateForm);
+	console.log("instanceof -> ", validateForm instanceof FormValidator);
 	//var validateForm = new FormValidator('body > form', validations);
 
-	validateForm.addMethod("greather", function(value, element, param){
+	// validateForm.addMethod("greather", function(value, element, param){
 
-		return value.length > 8;
+	// 	return value.length > 8;
 
-	}, "Greather than 8.");
+	// }, "Greather than 8.");
 
 	//console.log(validateForm);
 	

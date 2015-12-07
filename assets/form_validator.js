@@ -46,6 +46,7 @@
  		_containerFieldErrorClass: 'with-error',
  		_messageErrorClass: 'error',
  		_defaultErrorMessage: 'Fix this field.',
+ 		_defaultErrorListMessage: 'Please double check your data before continuing:',
  		_defaultMessages: {
 	 		required: 'This field is required',
 	 		email: 'Fill this field with the format "user@server.com"',
@@ -55,7 +56,7 @@
 	 	},
  		_validations: {
  			//Return if element attemp the requisitions
- 			required: function(value, element, param) {
+ 			required: function( value, element, param ) {
 
  				//Fallback to select element
  				if( element.nodeName.toLowerCase() === 'select' ) {
@@ -85,24 +86,24 @@
  				}
  			},
  			//Checks if the value is a valid e-mail
-	 		email: function(value, element, param) {
+	 		email: function( value, element, param ) {
 	 			
     			//return /^[a-z0-9]+([._][a-z0-9]+)*(+[a-z0-9_-]+)@[a-z0-9]+([.-][a-z0-9]+)*\.[a-z]{2,4}?$/i.test(value);
 	 			var reg = /\S+@\S+\.\S+/;
 
- 				return validator.optional(element) || reg.test(value);
+ 				return validator.optional( element ) || reg.test( value );
  			},
  			//Checks if the value is greather than the set
-	 		min: function(value, element, param) {
- 				return validator.optional(element) || value.length >= param;
+	 		min: function( value, element, param ) {
+ 				return validator.optional( element ) || value.length >= param;
  			},
  			//Checks if the value is less than the set
-	 		max: function(value, element, param) {
- 				return validator.optional(element) || value.length <= param;
+	 		max: function( value, element, param ) {
+ 				return validator.optional( element ) || value.length <= param;
  			},
  			//Checks if the current field value is equal to another
-	 		equalTo: function(value, element, param) {
-	 			var elEqual = document.querySelector(param);
+	 		equalTo: function( value, element, param ) {
+	 			var elEqual = form.querySelector(param);
 	 			
  				return validator.optional(elEqual) || (value === elEqual.value && value.length > 0);
  			}
@@ -114,7 +115,7 @@
  		 * @param  object field
  		 * @return boolean
  		 */
- 		optional: function(field) {
+ 		optional: function( field ) {
 
  			var fieldRules = validations.rules[field.name];
  			
@@ -312,9 +313,10 @@
  		},
 
  		/**
- 		 * [errorsMessages description]
- 		 * @param  {[type]} fieldName [description]
- 		 * @return {[type]}           [description]
+ 		 * Return errors messages
+ 		 * 
+ 		 * @param  object fieldName
+ 		 * @return array messages
  		 */
  		errorsMessages: function( fieldName ) {
 
@@ -351,9 +353,10 @@
  		},
 
  		/**
- 		 * [check description]
- 		 * @param  {[type]} field [description]
- 		 * @return {[type]}       [description]
+ 		 * Validate a field, add errors and show messages
+ 		 * 
+ 		 * @param  object field
+ 		 * @return boolean validField
  		 */
  		check: function( field ) {
 
@@ -432,13 +435,15 @@
  				validField = validator.check(field);
 
  				//Invalidate form
- 				if(!validField) validForm = false;
+ 				if( !validField ) validForm = false;
 
  			};
 
  			validator._valid = validForm;
 
  			validator.handleRemoveErrorOnBlur();
+
+ 			return validator._valid;
  		},
 
  		/**
@@ -458,7 +463,7 @@
 
 		 		field = element.querySelector("input, textarea, select");
 
-		 		if(field) {
+		 		if( field ) {
 
 			 		field.onblur = (function() {
 	
@@ -480,7 +485,7 @@
  		 * @param  object e (event)
  		 * @return
  		 */
- 		handleOnSubmit: function(e) {
+ 		handleOnSubmit: function( e ) {
 
  			//Prevent the form's submit
 			e.preventDefault();
@@ -503,16 +508,25 @@
 		},
 
 		/**
-		 * [handleErrorsList description]
-		 * @param  {[type]} containerErrorsList [description]
-		 * @return {[type]}                     [description]
+		 * Handle errors list at a defined container
+		 * 
+		 * @param  object containerErrorsList
+		 * @return
 		 */
 		handleErrorsList: function( containerErrorsList ) {
 
 			var containerErrorsList = document.querySelector( containerErrorsList ),
 				list = document.createDocumentFragment(),
+				div = document.createElement('div'),
+				p = document.createElement('p'),
 				ul = document.createElement('ul'),
 				li;
+
+			div.className = 'error-messages';
+			p.textContent = validator._defaultErrorListMessage;
+			div.appendChild(p);
+			div.appendChild(ul);
+			list.appendChild(div);
 
 			validator.errorsMessages().forEach(function(element, index) {
 
@@ -522,7 +536,7 @@
 
 			});
 
-			list = list.appendChild(ul);
+			list.appendChild(ul);
 
 			containerErrorsList.innerHTML = '';
 			containerErrorsList.appendChild(list);
@@ -539,11 +553,23 @@
 			//Define form object by the object form or by string
 			form = typeof form === 'string' ? document.querySelector(form) : form;
 
-			//Brake the submit
-		 	form.onsubmit = validator.handleOnSubmit;
+			if ( validations ) {
 
-		 	//Set the messages
-		 	validator._messages = validator.exchangeMessages(validator._defaultMessages, validations.messages);
+				//Brake the submit
+			 	form.onsubmit = validator.handleOnSubmit;
+
+			 	//Set the messages
+			 	validator._messages = validator.exchangeMessages(validator._defaultMessages, validations.messages);
+
+			}
+			else {
+
+				//
+				validator._valid = true;
+
+				//throw("Nothing to validate.");
+
+			}
 
 		}
  	};
@@ -562,7 +588,7 @@
 
  		//Return errors messages object
  		errorsMessages: validator.errorsMessages
- 		
+
  	};
 
  });
