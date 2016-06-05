@@ -1,26 +1,44 @@
+var
 //Get the form to validate
-var form = document.getElementsByTagName( 'form' )[ 0 ];
+  form = document.getElementsByTagName('form')[0],
+  //Validations to be executed
+  validations = {
+    rules: {
+      'name': {
+        'required': true,
+        'greather': true
+      },
+      'email': {
+        'required': true,
+        'email': true
+      },
+      'password': {
+        'required': false,
+        'min': 8
+      },
+      'password_confirmation': {
+        'required': false,
+        'equalTo': "input[name='password']"
+      }
+    }
+  },
+  //Custom options to FormValidator;
+  validateOptions = {
+    //Container errors list
+    containerErrorsList: '#error-messages-content',
+    //Default title before container errors list
+    defaultErrorListMessage: 'Por favor, verifique os erros.',
+    //Exchange default messages
+    defaultMessages: {
+      required: 'Este campo é requerido.',
+      email: 'Preencha este campo no formato "usuario@servidor.com"',
+      min: 'Preencha este campo com no mínimo de {0} caracteres.',
+      max: 'Preencha este campo com no máximo of {0} caracteres.',
+      equalTo: 'Este campo não é igual ao anterior'
+    }
+  };
 
-//Validations to be executed
-var validations = {
-	rules: {
-		'name': {
-			'required': true,
-			'greather': true
-		},
-		'email': {
-			'required': true,
-			'email': true
-		},
-		'password': {
-			'required': false,
-			'min': 8
-		},
-		'password_confirmation': {
-			'required': false,
-			'equalTo': "input[name='password']"
-		}
-	}/* 
+/* 
 	//Custom fields messages
 	,messages: {
 		'name': {
@@ -37,57 +55,37 @@ var validations = {
 			'equalTo': "A confirmação de senha não confere."
 		}
 	}*/
-};
 
-//Custom options to FormValidator
-var validateOptions = {
-
-	//Container errors list
-	_containerErrorsList: '#error-messages-content',
-
-	//Default title before container errors list
-	_defaultErrorListMessage: 'Por favor, verifique os erros.',
-
-	//Exchange default messages
-	_defaultMessages: {
- 		required: 'Este campo é requerido.',
- 		email: 'Preencha este campo no formato "usuario@servidor.com"',
- 		min: 'Preencha este campo com no mínimo de {0} caracteres.',
- 		max: 'Preencha este campo com no máximo of {0} caracteres.',
- 		equalTo: 'Este campo não é igual ao anterior'
- 	}
-
-};
 
 window.onload = function() {
+  //Instantiate form
+  var
+    validateForm = new FormValidator(form, validations, validateOptions);
 
-	//Instantiate form
-	var validateForm = new FormValidator( form, validations, validateOptions );
+  //Get form by selector
+  //var validateForm = new FormValidator('body > form', validations);
 
-	//Get form by selector
-	//var validateForm = new FormValidator('body > form', validations);
+  //Custom method
+  // validateForm.addMethod("myCustomMethod", function( value, element, param ){
 
-	//Custom method
-	// validateForm.addMethod("myCustomMethod", function( value, element, param ){
+  // 	return value.length > 8;
 
-	// 	return value.length > 8;
+  // }, "Message from my custom method.");
 
-	// }, "Message from my custom method.");
-	
-	//Validation with ajax action
-	// form.onsubmit = function(e){
-		
-	// 	e.preventDefault();
+  //Validation with ajax action
+  // form.onsubmit = function(e){
 
-	//Handle the validate 
-	// 	validateForm.valid();
+  // 	e.preventDefault();
 
-	//Show message errors
-	// 	console.log("List of errors -> ", validateForm.errorsMessages());
+  //Handle the validate 
+  // 	validateForm.valid();
 
-	// 	if( validateForm.valid() )
-	// 	{
-	// 		alert("Sending the data...");
-	// 	}
-	// };
+  //Show message errors
+  // 	console.log("List of errors -> ", validateForm.errorsMessages());
+
+  // 	if( validateForm.valid() )
+  // 	{
+  // 		alert("Sending the data...");
+  // 	}
+  // };
 };
