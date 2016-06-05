@@ -59,15 +59,15 @@ var
         _fields: [],
         _messages: {},
         _errors: {},
-        containerFieldErrorClass: options.containerFieldErrorClass || 'with-error',
-        messageErrorClass: options.messageErrorClass || 'error',
-        defaultErrorMessage: options.defaultErrorMessage || 'Fix this field.',
-        defaultErrorListMessage: options.defaultErrorListMessage || 'Please double check your data before continuing:',
+        containerFieldErrorClass: options && options.containerFieldErrorClass || 'with-error',
+        messageErrorClass: options && options.messageErrorClass || 'error',
+        defaultErrorMessage: options && options.defaultErrorMessage || 'Fix this field.',
+        defaultErrorListMessage: options && options.defaultErrorListMessage || 'Please double check your data before continuing:',
         defaultMessages: {
-          required: options.defaultMessages.required || 'This field is required',
-          email: options.defaultMessages.email || 'Fill this field with the format "user@server.com"',
-          min: options.defaultMessages.min || 'Fill this field with minimum of {0} characters.',
-          max: options.defaultMessages.max || 'Fill this field with maximum of {0} characters.',
+          required: options && options.defaultMessages.required || 'This field is required',
+          email: options && options.defaultMessages.email || 'Fill this field with the format "user@server.com"',
+          min: options && options.defaultMessages.min || 'Fill this field with minimum of {0} characters.',
+          max: options && options.defaultMessages.max || 'Fill this field with maximum of {0} characters.',
           equalTo: 'This field is wrong.'
         },
         _validations: {
@@ -536,12 +536,13 @@ var
             //Validate the form
             validator._valid = true;
             console.log("Nothing to validate.");
+          } else {
+            //Set the messages
+            validator._messages = validator.exchangeMessages(validator.defaultMessages, validations.messages);
           }
 
           //Brake the submit
           form.addEventListener('submit', validator.handleOnSubmit);
-          //Set the messages
-          validator._messages = validator.exchangeMessages(validator.defaultMessages, validations.messages);
         }
       };
 
