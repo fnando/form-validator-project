@@ -3,9 +3,9 @@
  *
  * @author Carlos Henrique Carvalho de Santana <carlohcs@gmail.com>
  *
- * @date 2015-11-30 
- * 
- * Description: 
+ * @date 2015-11-30
+ *
+ * Description:
  *
  * 	Simple class to validate a form. See bellow the syntax.
  *
@@ -479,7 +479,7 @@ var
 
           //Verify if form is valid
           if (!validator._valid) {
-            if (options.containerErrorsList) {
+            if (options && options.containerErrorsList) {
               validator.handleErrorsList(options.containerErrorsList);
             }
             return;
