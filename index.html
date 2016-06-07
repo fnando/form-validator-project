@@ -7,26 +7,14 @@
 </head>
 <body>
   <form action="#">
-    <div class="error-messages">
-      <p>
-        Please double check your data before continuing:
-      </p>
 
-      <ul>
-        <li>
-          The name is required.
-        </li>
-      </ul>
-    </div>
+    <div id="error-messages-content"></div>
 
-    <p class="with-error">
+    <p>
       <label for="name">Your name</label>
       <input type="text" name="name" id="name">
       <span class="hint">
         This is how your colleagues will see your name.
-      </span>
-      <span class="error">
-        The name is required.
       </span>
     </p>
 
@@ -60,7 +48,7 @@
   </form>
 
   <script src="assets/jquery.js"></script>
-  <script src="assets/form_validator.js"></script>
+  <script src="assets/formValidator.js"></script>
   <script src="assets/script.js"></script>
 </body>
 </html>
